@@ -73,7 +73,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Failed to save the report." }, { status: 500 });
     }
 
-    await notifyTelegram(report);
+    // Send Telegram notification in background (don't block API response)
+    notifyTelegram(report).catch((error) => {
+      console.error("Telegram notification failed:", error);
+    });
 
     return NextResponse.json({ success: true, reportId: report.id });
   } catch (error) {
